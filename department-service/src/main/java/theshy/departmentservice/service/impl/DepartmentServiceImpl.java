@@ -26,7 +26,7 @@ public class DepartmentServiceImpl implements DepartmentService {
                 departmentDTO.getDepartmentDescription(),
                 departmentDTO.getDepartmentCode()
         );
-        Department savedDepartment = departmentRepository.save(department);
+        departmentRepository.save(department);
         DepartmentDTO savedDepartmentDTO = new DepartmentDTO(
                 departmentDTO.getId(),
                 departmentDTO.getDepartmentName(),
