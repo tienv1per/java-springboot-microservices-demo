@@ -10,6 +10,7 @@ import theshy.employeeservice.dto.DepartmentDTO;
 import theshy.employeeservice.dto.EmployeeDTO;
 import theshy.employeeservice.entity.Employee;
 import theshy.employeeservice.repository.EmployeeRepository;
+import theshy.employeeservice.service.APIClient;
 import theshy.employeeservice.service.EmployeeService;
 
 @Service
@@ -22,6 +23,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private WebClient webClient;
+
+    @Autowired
+    private APIClient apiClient;
 
     @Override
     public EmployeeDTO saveEmployee(EmployeeDTO employeeDTO) {
@@ -52,11 +56,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 //
 //        DepartmentDTO departmentDTO = responseEntity.getBody();
 
-        DepartmentDTO departmentDTO = webClient.get()
-                .uri("http://localhost:8080/api/departments/" + employee.getDepartmentCode())
-                .retrieve()
-                .bodyToMono(DepartmentDTO.class)
-                .block();
+        // use WebClient to make API request to Department Service
+//        DepartmentDTO departmentDTO = webClient.get()
+//                .uri("http://localhost:8080/api/departments/" + employee.getDepartmentCode())
+//                .retrieve()
+//                .bodyToMono(DepartmentDTO.class)
+//                .block();
+
+        DepartmentDTO departmentDTO = apiClient.getDepartment(employee.getDepartmentCode());
 
         EmployeeDTO employeeDTO = new EmployeeDTO(
                 employee.getId(),
