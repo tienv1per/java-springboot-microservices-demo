@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import theshy.employeeservice.dto.APIResponseDTO;
 import theshy.employeeservice.dto.DepartmentDTO;
 import theshy.employeeservice.dto.EmployeeDTO;
@@ -18,6 +19,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private WebClient webClient;
 
     @Override
     public EmployeeDTO saveEmployee(EmployeeDTO employeeDTO) {
@@ -44,9 +48,15 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = employeeRepository.findById(id).get();
 
         // make a REST API call and return DepartmentDTO in response
-        ResponseEntity<DepartmentDTO> responseEntity = restTemplate.getForEntity("http://localhost:8080/api/departments/" + employee.getDepartmentCode(), DepartmentDTO.class);
+//        ResponseEntity<DepartmentDTO> responseEntity = restTemplate.getForEntity("http://localhost:8080/api/departments/" + employee.getDepartmentCode(), DepartmentDTO.class);
+//
+//        DepartmentDTO departmentDTO = responseEntity.getBody();
 
-        DepartmentDTO departmentDTO = responseEntity.getBody();
+        DepartmentDTO departmentDTO = webClient.get()
+                .uri("http://localhost:8080/api/departments/" + employee.getDepartmentCode())
+                .retrieve()
+                .bodyToMono(DepartmentDTO.class)
+                .block();
 
         EmployeeDTO employeeDTO = new EmployeeDTO(
                 employee.getId(),
