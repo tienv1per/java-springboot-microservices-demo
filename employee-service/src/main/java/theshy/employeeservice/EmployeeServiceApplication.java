@@ -15,6 +15,7 @@ public class EmployeeServiceApplication {
 		return new RestTemplate();
 	}
 
+	// tao ra 1 object WebClient va assign no la 1 Bean
 	@Bean
 	public WebClient webClient(){
 		return WebClient.builder().build();
