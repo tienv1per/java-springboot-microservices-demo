@@ -1,6 +1,9 @@
 package theshy.employeeservice.service.impl;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,8 @@ import theshy.employeeservice.service.EmployeeService;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeServiceImpl.class);
+
     @Autowired
     private EmployeeRepository employeeRepository;
 
@@ -48,9 +53,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         return savedEmployeeDTO;
     }
 
-    @CircuitBreaker(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
+    // @CircuitBreaker(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
+    @Retry(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
     @Override
     public APIResponseDTO getEmployeeById(Long id) {
+        LOGGER.info("inside getEmployeeById() method");
+
         Employee employee = employeeRepository.findById(id).get();
 
         // make a REST API call and return DepartmentDTO in response
@@ -83,6 +91,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     public APIResponseDTO getDefaultDepartment(Long id, Exception exception){
+        LOGGER.info("inside getDefaultDepartment() method");
+
         Employee employee = employeeRepository.findById(id).get();
 
         DepartmentDTO departmentDTO = new DepartmentDTO();
