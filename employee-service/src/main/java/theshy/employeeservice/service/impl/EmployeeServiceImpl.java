@@ -1,5 +1,6 @@
 package theshy.employeeservice.service.impl;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return savedEmployeeDTO;
     }
 
+    @CircuitBreaker(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
     @Override
     public APIResponseDTO getEmployeeById(Long id) {
         Employee employee = employeeRepository.findById(id).get();
@@ -57,13 +59,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        DepartmentDTO departmentDTO = responseEntity.getBody();
 
         // use WebClient to make API request to Department Service
-//        DepartmentDTO departmentDTO = webClient.get()
-//                .uri("http://localhost:8080/api/departments/" + employee.getDepartmentCode())
-//                .retrieve()
-//                .bodyToMono(DepartmentDTO.class)
-//                .block();
+        DepartmentDTO departmentDTO = webClient.get()
+                .uri("http://localhost:8080/api/departments/" + employee.getDepartmentCode())
+                .retrieve()
+                .bodyToMono(DepartmentDTO.class)
+                .block();
 
-        DepartmentDTO departmentDTO = apiClient.getDepartment(employee.getDepartmentCode());
+        // DepartmentDTO departmentDTO = apiClient.getDepartment(employee.getDepartmentCode());
 
         EmployeeDTO employeeDTO = new EmployeeDTO(
                 employee.getId(),
